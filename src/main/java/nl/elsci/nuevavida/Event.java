@@ -25,7 +25,7 @@ public class Event implements ResultListener {
 //        viewScene(scene, listener);
     }
 
-    private void viewScene(Scene scene, ResultListener listener) {
+    private void viewScene(GameScene scene, ResultListener listener) {
         this.listener = listener;
 
     }

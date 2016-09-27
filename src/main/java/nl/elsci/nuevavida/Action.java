@@ -10,4 +10,9 @@ public class Action {
     private String desc;
     private String text;
     private List<String> next;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
