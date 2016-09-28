@@ -234,9 +234,7 @@ public class NuevaVidaGame extends Application {
 
         borderPane.setTop(flowPane);
 
-        TextArea weekInfoText = new TextArea("Week 2\n" +
-                "\n" +
-                "\n" +
+        TextArea weekInfoText = new TextArea("Week 2\n\n\n" +
                 "Your stress remains unchanged this week at 0");
         weekInfoText.setEditable(false);
         borderPane.setCenter(weekInfoText);
