@@ -3,14 +3,13 @@ package nl.elsci.nuevavida;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -40,6 +39,10 @@ public class NuevaVidaGame extends Application {
     private Transition transition;
 
     private Configuration configuration;
+    private ComboBox<Activity> dateActivityComboBox;
+    private ComboBox<Activity> workActivityComboBox;
+    private ComboBox<Activity> freeTimeActivityComboBox;
+    private ComboBox<Activity> weekendActivityComboBox;
 
     public NuevaVidaGame() {
 
@@ -61,11 +64,12 @@ public class NuevaVidaGame extends Application {
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Nuevavida");
 
-//        weekPlannerScene = createFirstScene();
+        weekPlannerScene = createWeekPlanner();
         sceneViewer = createSceneViewer();
 
         GameScene gameScene = new GameScene(configuration.getScenes().get(0));
-        viewGameScene(gameScene);
+//        viewGameScene(gameScene);
+        viewWeekPlanner(new WeekStartInfo());
 
         primaryStage.show();
     }
@@ -115,7 +119,7 @@ public class NuevaVidaGame extends Application {
                 if (transition.getNextScene() != null) {
                     viewGameScene(transition.getNextScene());
                 } else {
-                    viewWeekPlanner();
+                    viewWeekPlanner(new WeekStartInfo());//TODO
                 }
             } else if (selectedItem != null) {
                 doTransition(currentGameScene.process(selectedItem));
@@ -127,8 +131,10 @@ public class NuevaVidaGame extends Application {
         return new Scene(pane, 800, 600);
     }
 
-    private void viewWeekPlanner() {
+    private void viewWeekPlanner(WeekStartInfo weekStartInfo) {
         //TODO
+
+        primaryStage.setScene(weekPlannerScene);
     }
 
     public void viewGameScene(GameScene scene) {
@@ -156,47 +162,95 @@ public class NuevaVidaGame extends Application {
         }
     }
 
-/*
-    private Scene createFirstScene() {
+    private Scene createWeekPlanner() {
+
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        columnConstraints.setPercentWidth(25);
+        grid.getColumnConstraints().add(columnConstraints);
+        columnConstraints = new ColumnConstraints();
+        columnConstraints.setPercentWidth(25);
+        grid.getColumnConstraints().add(columnConstraints);
+        columnConstraints = new ColumnConstraints();
+        columnConstraints.setPercentWidth(50);
+        grid.getColumnConstraints().add(columnConstraints);
         grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+        grid.setHgap(10);
 
-        Text sceneTitle = new Text("Welcome");
-        sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        grid.add(sceneTitle, 0, 0, 2, 1);
+        workActivityComboBox = new ComboBox<>();
+        workActivityComboBox.setPrefWidth(150);
+        Label workLabel = new Label("Work Activity:");
+        workLabel.setPrefWidth(175);
+        workLabel.setLabelFor(workActivityComboBox);
 
-        Label userName = new Label("User Name:");
-        grid.add(userName, 0, 1);
+        grid.add(workLabel, 0, 0);
+        grid.add(workActivityComboBox, 1, 0);
+        grid.add(createOutfitComboBox(), 2, 0);
 
-        TextField userTextField = new TextField();
-        grid.add(userTextField, 1, 1);
+        freeTimeActivityComboBox = new ComboBox<>();
+        freeTimeActivityComboBox.setPrefWidth(150);
+        Label freeTimeLabel = new Label("Free Time Activity:");
+        freeTimeLabel.setPrefWidth(175);
+        freeTimeLabel.setLabelFor(freeTimeActivityComboBox);
 
-        Label pw = new Label("Password:");
-        grid.add(pw, 0, 2);
+        grid.add(freeTimeLabel, 0, 1);
+        grid.add(freeTimeActivityComboBox, 1, 1);
+        grid.add(createOutfitComboBox(), 2, 1);
 
-        PasswordField pwBox = new PasswordField();
-        grid.add(pwBox, 1, 2);
+        weekendActivityComboBox = new ComboBox<>();
+        weekendActivityComboBox.setPrefWidth(150);
+        Label weekendLabel = new Label("Weekend Activity:");
+        weekendLabel.setPrefWidth(175);
+        weekendLabel.setLabelFor(weekendActivityComboBox);
 
-        Button btn = new Button("Sign in");
-        HBox hbBtn = new HBox(10);
-        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-        hbBtn.getChildren().add(btn);
-        grid.add(hbBtn, 1, 4);
+        grid.add(weekendLabel, 0, 2);
+        grid.add(weekendActivityComboBox, 1, 2);
+        grid.add(createOutfitComboBox(), 2, 2);
 
-        Text actiontarget = new Text();
-        grid.add(actiontarget, 1, 6);
+        dateActivityComboBox = new ComboBox<>();
+        dateActivityComboBox.setPrefWidth(150);
+        Label dateLabel = new Label("Weekend Evening Activity:");
+        dateLabel.setPrefWidth(175);
+        dateLabel.setLabelFor(dateActivityComboBox);
 
-        btn.setOnAction(event -> {
-            actiontarget.setFill(Color.FIREBRICK);
-            actiontarget.setText("Sign in button pressed");
-        });
+        grid.add(dateLabel, 0, 3);
+        grid.add(dateActivityComboBox, 1, 3);
+        grid.add(createOutfitComboBox(), 2, 3);
 
-        return new Scene(grid, 300, 275);
+        Button startWeekButton = new Button("Start Week");
+        startWeekButton.setFont(new Font("Tahoma", 14));
+        startWeekButton.setOnAction(event -> {/*todo*/});
+
+        FlowPane flowPane = new FlowPane(Orientation.VERTICAL);
+        flowPane.setVgap(10);
+        flowPane.setPrefSize(700, 250);
+        flowPane.getChildren().add(startWeekButton);
+        flowPane.getChildren().add(grid);
+
+        flowPane.setAlignment(Pos.CENTER);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(20));
+
+        borderPane.setTop(flowPane);
+
+        TextArea weekInfoText = new TextArea("Week 2\n" +
+                "\n" +
+                "\n" +
+                "Your stress remains unchanged this week at 0");
+        weekInfoText.setEditable(false);
+        borderPane.setCenter(weekInfoText);
+
+        return new Scene(borderPane, 800, 600);
     }
-*/
+
+    private ComboBox<String> createOutfitComboBox() {
+        ComboBox<String> freeTimeOutfitComboBox = new ComboBox<>();
+        freeTimeOutfitComboBox.getItems().add("Random outfit");
+        freeTimeOutfitComboBox.getSelectionModel().select(0);
+        freeTimeOutfitComboBox.setPrefWidth(300);
+        return freeTimeOutfitComboBox;
+    }
 
     public static void main(String[] args) throws FileNotFoundException {
         launch(args);
