@@ -6,5 +6,6 @@ deploy:
   api_key:
     secure: skA9em5Evj6zYDV6LJkUwvrFK3xXI9VPWswlaryg0SokFQWJlUYoSL78GdVxzqWSImSSNamc2so6eSnurJ2I5m0DuFhq2hgCHTctIoz7Ih1Nr4gtJqJFnwen2pyhg9jpRret7+I9pmtjccZ1jnwzSdB3TFoSfIuKtLEDTHkssYqV1Ux5E6lOm/Zadid30esrNL4uAtlAvcymBgLLrE90CQBOqfa3Sf5afo98fpOOlqEuUZwQUGdBgpnUM7+UZHRJFX4KxNzmxCoZasdykuzTsCK78c6zZUjKu4jTszqr4KYMDzsURIaoZH+vFKOMAm+B4w6R7knMwYs4/8k86bFFi/am3nDkav7EsIV6+lO/4gMTVnqtRdSAcR/U4GMVkLiPxFcWag3L+oT4yTTLRYZR7HRtli/BMLEFT9L1m1ikW7V0QwGaE930Lsq84XVpv/azZkTGYS00LG9qHdbTUyArxrXf+kN56DtTHWrIAMj1TE8kLF02RPbpTjhVvOf3RGMlbE0I0fFAxWexzSeTLeKXH/lZAlY+F6FrGqrv3uUV5B5IaqEeL7kbFLZYtAgReav6iReUrRlCAKbkkYXHnFgwMEk0+V3yMCM6VmvwH5yp920XrvmjK03/WcQmjHgnA2l5wQT4JOSsYui54fbb7GW0yH6ia77jpMPcu7+6HQ1mI1k=
   file: target/nuevavida-1.0-SNAPSHOT-jar-with-dependencies.jar
+  skip_cleanup: true
   on:
-    repo: elsci/nuevavida
+    tags: true
