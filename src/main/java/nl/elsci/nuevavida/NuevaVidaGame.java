@@ -4,35 +4,53 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 public class NuevaVidaGame extends Application {
-    private Stage primaryStage;
-    private Scene weekPlannerScene;
-    private Scene sceneViewerScene;
 
-    private GameScene currentGameScene;
-    private ObservableList<Action> actionList;
+    private static final Logger log = LoggerFactory.getLogger(NuevaVidaGame.class);
+
+    private Stage primaryStage;
+
+    private Scene weekPlannerScene;
+
+    private Scene sceneViewer;
     private TextArea sceneText;
-    private Action finishedAction;
-    private Transition transition;
+    private ObservableList<Action> actionList;
     private MultipleSelectionModel<Action> selectionModel;
 
-//    private Configuration configuration;
+    private GameScene currentGameScene;
+    private Action finishedAction;
+    private Transition transition;
 
-/*
-    public NuevaVidaGame(Configuration configuration) {
-        this.configuration = configuration;
-    }
-*/
+    private Configuration configuration;
 
     public NuevaVidaGame() {
+
+        Yaml yaml = new Yaml(new Constructor(Configuration.class));
+        try {
+            configuration = yaml.loadAs(new FileReader("src/main/resources/test.yaml"), Configuration.class);
+        } catch (FileNotFoundException e) {
+            log.error("Unable to load configuration", e);
+            configuration = new Configuration();
+        }
+
         finishedAction = new Action();
         finishedAction.setName("Finished");
         finishedAction.setDesc("End the scene and move on to the next event, or to the next week if this is this week's last event.");
@@ -41,20 +59,20 @@ public class NuevaVidaGame extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
-
         primaryStage.setTitle("Nuevavida");
 
 //        weekPlannerScene = createFirstScene();
-        sceneViewerScene = createSceneViewerScene();
+        sceneViewer = createSceneViewer();
 
-        GameScene gameScene = new GameScene();
-
+        GameScene gameScene = new GameScene(configuration.getScenes().get(0));
         viewGameScene(gameScene);
 
         primaryStage.show();
     }
 
-    private Scene createSceneViewerScene() {
+    private Scene createSceneViewer() {
+
+        log.debug("creating sceneviewer scene");
 
         BorderPane pane = new BorderPane();
         sceneText = new TextArea();
@@ -114,13 +132,16 @@ public class NuevaVidaGame extends Application {
     }
 
     public void viewGameScene(GameScene scene) {
+
+        log.debug("switching to scene " + scene.getName());
+
         currentGameScene = scene;
         sceneText.clear();
         doTransition(scene.getStartTransition());
-        primaryStage.setScene(sceneViewerScene);
+        primaryStage.setScene(sceneViewer);
     }
 
-    public void doTransition(Transition transition) {
+    private void doTransition(Transition transition) {
         this.transition = transition;
         if (sceneText.getText().length() > 0) {
             sceneText.appendText("_________________________\n\n");

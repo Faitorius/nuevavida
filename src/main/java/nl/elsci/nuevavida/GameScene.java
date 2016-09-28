@@ -8,6 +8,11 @@ import java.util.Arrays;
 @Data
 public class GameScene {
     private String name;
+    private final SceneTemplate template;
+
+    public GameScene(SceneTemplate template) {
+        this.template = template;
+    }
 
     public Transition process(Action selectedItem) {
         //TODO
