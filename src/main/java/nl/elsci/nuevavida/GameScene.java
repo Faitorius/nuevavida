@@ -2,39 +2,56 @@ package nl.elsci.nuevavida;
 
 import lombok.Data;
 
+import javax.el.ELException;
+import javax.el.ELProcessor;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 @Data
 public class GameScene {
     private String name;
     private final SceneTemplate template;
+    private ELProcessor elp;
+    private List<String> flags = new ArrayList<>();
 
-    public GameScene(SceneTemplate template) {
+    public GameScene(SceneTemplate template, ELProcessor elp) {
         this.template = template;
+        this.elp = elp;
     }
 
-    public Transition process(Action selectedItem) {
-        //TODO
-        Transition transition = new Transition("Done!", new ArrayList<>());
-        transition.setNextScene(this);
+    public Transition process(Action action) {
+        List<Action> actions = getActions(action.getNext());
+        Transition transition = new Transition(action.getText(), actions);
+        if (action.getNext() == null || action.getNext().isEmpty()) {
+            transition.setNextScene(this);
+        }
         return transition;
     }
 
     public Transition getStartTransition() {
-        Action action1 = new Action();
-        action1.setName("Apply for the job");
-        action1.setDesc("Send in your CV");
-        Action action2 = new Action();
-        action2.setName("Apply for the second job");
-        action2.setDesc("Send in your other CV");
 
-        return new Transition("A few years from now:\n" +
-                "\n" +
-                "The last few years have not been the best for you. You're single, you've mostly lost contact with your friends and family, and you don't even have much of a job to speak of. \n" +
-                "You just haven't been able to dig yourself out of this rut, and you've become more and more miserable about your life, so that now you mostly just doze through your dead-end job and doze the evenings away mindlessly clicking on the internet. \n" +
-                "\n" +
-                "Just as things seem most bleak you get an email from Ivy. She's a woman you met about six months ago when she came to your hometown on holiday. Not a girlfriend or anything like that, but probably the only friend you still talk to regularly, even if she doesn't live close enough to visit.\n" +
-                "She sends you a link to a job that's opened up near where she lives. A job offer with much better pay and prospects than your current one, and one that might even match your skills. It's also one that means moving far away from your home, but it's not like you had anything keeping you there. ", Arrays.asList(action1, action2));
+        List<Action> actions = getActions(template.getIntroActions());
+
+        return new Transition(template.getIntro(), actions);
+    }
+
+    private List<Action> getActions(Iterable<String> actionStrings) {
+        List<Action> actions = new ArrayList<>();
+        if (actionStrings != null) {
+            for (String actionName : actionStrings) {
+                String eval;
+                try {
+                    eval = (String) elp.eval(actionName);
+                } catch(ELException e) {
+                    eval = actionName;
+                }
+                Action action = template.getActions().get(eval);
+                if (action != null) {
+                    action.setName(actionName);
+                    actions.add(action);
+                }
+            }
+        }
+        return actions;
     }
 }

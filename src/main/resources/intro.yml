@@ -1,0 +1,147 @@
+scenes:
+- name: Intro 1
+  intro: >
+    A few years from now:
+
+
+    The last few years have not been the best for you. You're single, you've mostly lost contact with your friends
+    and family, and you don't even have much of a job to speak of.
+
+    Worse, as your finances took a dive you were forced to apply for a housemate, and unfortunately you found one.
+    He's a tall, thin and ragged young man who eschews his given name for the moniker "Skeeve".
+
+
+    For now though, you're alone at home. It's the evening, and you're mindlessly clicking away on the internet.
+  introActions:
+  - Check your email
+  people: >
+    'You\'re here. I would describe you, but let\'s wait until I\'ve found out a little more first.'.concat(
+    scene.flags.contains('THUGS_ARRIVED')
+    ? '
+
+    There\'s also a pair of criminal-looking thugs here, but let\'s not lower ourselves to detailed descriptions
+    of such scum.' : '')
+  desc: >
+    scene.flags.contains('THUGS_ARRIVED')
+    ? 'You\'re at home, confronted with some rather unpleasant visitors.'
+    : 'You\'re at home.'
+  actions:
+    Check your email:
+      desc: Maybe you have some new email. That would be more interesting than the site you're currently browsing. What
+        kind of idiot thinks pink and white is a good colour scheme for a blog?
+      text: You open up your email, hoping to at least have some vaguely interesting spam. To your surprise, you have an
+        actual message. An actual message from someone you know!
+
+        The sender seems to be Ivy, a young woman you met on a web forum and sometimes exchange email with. She's some
+        kind of scientist from an unexceptional city somewhere in the UK.
+      next:
+      - Read the email
+
+    Read the email:
+      desc: Well, you could just sit here staring at the subject line, or you could actually click on the bloody thing.
+      text: You open up the message and see that it's an invitation from Ivy to come visit her. It seems that she's been
+        having a tough time lately after a mishap with some baldness cure she developed, and she could use some company.
+      next:
+      - Consider her offer
+
+    Consider her offer:
+      desc: Think about it. After all, you have plenty of time to consider her offer. It's not like something contrived
+        and dramatic is going to force you over there.
+      text: >
+        scene.flags.add('THUGS_ARRIVED');
+        'You pause to consider her offer, but you\'re distracted by the doorbell.
+
+        Answering it, you find yourself confronted by two large men. "Where\'s Skeeve?" one of them grunts in a voice
+        that clearly isn\'t used to words of more than half a syllable.'
+      next:
+      - You don't know
+
+    You don't know:
+      desc: You've no idea where he is right now.
+      text: >
+        You tell the thugs that you've no idea where your housemate has gone. They shove you out of the way and barge
+        inside, ready to ransack his room. When they slam the door open though, you see that it's completely empty. Not
+        only is Skeeve not there, but all his things are gone too. There's just a scrap of paper lying on the bed.
+
+        The slightly more tattooed thug snatches it up, reads it, and then hands it to you. "Sorry dudes", it starts
+        "I've skipped town, so you can kiss your money goodbye, unless you can persuade my loser housemate to cough up."
+
+        You look up to see the hoods' cold vicious eyes staring down at you. "Two hundred thousand" one says. "Pay up
+        bitch" says the other.
+      next:
+      - Explain yourself
+
+    Explain yourself:
+      desc: You have nothing to do with this! Surely they'll understand that.
+      text: You try to explain how this is none of your business, but the cruellest of the thugs cuts you short with a
+        threatening gesture. "No excuses bitch. You'd better pay, or you'll find out why they call me 'Murderin Mervin'."
+      next:
+      - Escape!
+      - "scene.flags.contains('OFFERED_SEXUAL_FAVOURS') ? '' : 'Offer sexual favours'"
+      - "scene.flags.contains('BEGGED') ? '' : 'Beg'"
+      - "scene.flags.contains('BE_MURDERED') ? '' : 'Be murdered'"
+
+    Escape!:
+      desc: Distract the thugs and make your escape!
+      text: >
+        scene.flags.remove('THUGS_ARRIVED');
+        '"Look!" You shout, pointing behind the thugs, "It\'s Skeeve, and he has a gun!"
+
+        The two morons turn to look, and quick as a flash you pop open a window and nimbly make your way out of it.
+
+
+        Half an hour later you stop to catch your breath. You\'ve lost the hoods, but whichever criminal organisation
+        they represent, they\'ll surely be on your tail. You need to get out of this town.'
+      next:
+      - Go to Ivy
+
+    Offer sexual favours:
+      desc: Offer to sleep with the thugs in exchange for forgetting about the money.
+      text: >
+        scene.flags.add('OFFERED_SEXUAL_FAVOURS');
+        'You bat your eyelashes at Murderin\' Mervin and offer to give him a good time if he\'ll let you off the hook.
+
+        "Shut up bitch", he replies curtly. "I\'d have taken that offer from Skeeve, but not from the likes of you."'
+      next:
+      - Escape!
+      - "scene.flags.contains('BEGGED') ? '' : 'Beg'"
+      - "scene.flags.contains('BE_MURDERED') ? '' : 'Be murdered'"
+
+    Beg:
+      desc: Beg for mercy. Murderin' Mervin sounds like a merciful guy, right?
+      text: >
+        scene.flags.add('BEGGED');
+        'You appeal to Murderin\' Mervin\'s better nature. Unsurprisingly, this has no effect whatsoever.'
+      next:
+      - Escape!
+      - "scene.flags.contains('OFFERED_SEXUAL_FAVOURS') ? '' : 'Offer sexual favours'"
+      - "scene.flags.contains('BE_MURDERED') ? '' : 'Be murdered'"
+
+    Be murdered:
+      desc: Be murdered. This is usually considered a bad life choice.
+      text: >
+        scene.flags.add('BE_MURDERED');
+        'You apparently decide to just be murdered. Are you sure?'
+      next:
+      - Actually, no
+      - Kill me already!
+
+    Actually, no:
+      desc: Change your mind and don't be murdered. This has the advantage of you not being the victim of a murder.
+      text: >
+        In a moment of sanity, you decide that being murdered might not be a good idea after all.
+      next:
+      - Escape!
+      - "scene.flags.contains('OFFERED_SEXUAL_FAVOURS') ? '' : 'Offer sexual favours'"
+      - "scene.flags.contains('BEGGED') ? '' : 'Beg'"
+
+    Go to Ivy:
+      desc: Take Ivy up on her offer and travel to her city.
+      text: You find a payphone and sort out your travel arrangements. The next day, after a fearful night in a hotel,
+        you're on your way.
+
+        A few legs of the journey later, evening finds you on a train pulling into the station in Ivy's town. You queue
+        up at a taxi rank. It's drizzling, the sky is a leaden grey, and you can't help but feel that this is a grim
+        and dreary place to live.
+      next:
+      - Take a taxi
