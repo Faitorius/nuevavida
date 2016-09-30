@@ -1,33 +1,54 @@
 scenes:
 - name: Intro 1
   intro: >
-    A few years from now:
+    scene.flags.add('AT_HOME');
+    "A few years from now:
 
 
     The last few years have not been the best for you. You're single, you've mostly lost contact with your friends
     and family, and you don't even have much of a job to speak of.
 
     Worse, as your finances took a dive you were forced to apply for a housemate, and unfortunately you found one.
-    He's a tall, thin and ragged young man who eschews his given name for the moniker "Skeeve".
+    He's a tall, thin and ragged young man who eschews his given name for the moniker \"Skeeve\".
 
 
-    For now though, you're alone at home. It's the evening, and you're mindlessly clicking away on the internet.
+    For now though, you're alone at home. It's the evening, and you're mindlessly clicking away on the internet."
   introActions:
   - Check your email
   people: >
-    'You\'re here. I would describe you, but let\'s wait until I\'ve found out a little more first.'.concat(
+    "You're here. I would describe you, but let's wait until I've found out a little more first.".concat(
     scene.flags.contains('THUGS_ARRIVED')
-    ? '
-
-    There\'s also a pair of criminal-looking thugs here, but let\'s not lower ourselves to detailed descriptions
-    of such scum.' : scene.flags.contains('WITH_IVY')
     ? "
 
-    Ivy's also here. The only friend you can trust to help you hide from murderous thugs." : '')
+    There's also a pair of criminal-looking thugs here, but let's not lower ourselves to detailed descriptions
+    of such scum." : scene.flags.contains('WITH_IVY')
+    ? "
+
+    Ivy's also here. The only friend you can trust to help you hide from murderous thugs."
+    : scene.lastAction eq "Find Skeeve "
+    ? "
+
+    Skeeve is also here, the sniveling coward."
+    : scene.lastAction eq "Give him a thrashing"
+    ? "
+
+    Your cellmate is also here. She's probably a rogue underwear model or something, imprisoned for wearing excessively
+    skimpy underwear. The stuff she's wearing now certainly counts."
+    : scene.lastAction eq 'Make him pay'
+    ? "
+
+    Skeeve is also here. Probably clad in skin-tight leather." : '')
   desc: >
+    scene.flags.contains('AT_HOME') ? (
     scene.flags.contains('THUGS_ARRIVED')
-    ? 'You\'re at home, confronted with some rather unpleasant visitors.'
-    : 'You\'re at home.'
+    ? "You're at home, confronted with some rather unpleasant visitors."
+    : "You're at home.") :
+     (scene.lastAction eq 'Escape!' or scene.lastAction eq 'Go to Ivy') ? "You're on the run from evil criminals." :
+     scene.lastAction eq 'Take a taxi' ? "You're outside Ivy's house." :
+     scene.lastAction eq 'Find Skeeve ' ? "You're facing down your hapless former housemate." :
+     scene.lastAction eq 'Take pity on him' ? "You're preparing for a final climactic showdown battle. Wow, that sure would be an awesome thing to read about." :
+     scene.lastAction eq 'Make him pay' ? "You're chilling in your pimp pad." :
+     scene.lastAction eq 'Give him a thrashing' ? "You're in prison." : "You're at Ivy's house."
   actions:
     Check your email:
       desc: Maybe you have some new email. That would be more interesting than the site you're currently browsing. What
@@ -52,10 +73,10 @@ scenes:
         and dramatic is going to force you over there.
       text: >
         scene.flags.add('THUGS_ARRIVED');
-        'You pause to consider her offer, but you\'re distracted by the doorbell.
+        "You pause to consider her offer, but you're distracted by the doorbell.
 
-        Answering it, you find yourself confronted by two large men. "Where\'s Skeeve?" one of them grunts in a voice
-        that clearly isn\'t used to words of more than half a syllable.'
+        Answering it, you find yourself confronted by two large men. \"Where's Skeeve?\" one of them grunts in a voice
+        that clearly isn't used to words of more than half a syllable."
       next:
       - You don't know
 
@@ -134,6 +155,7 @@ scenes:
     Escape!:
       desc: Distract the thugs and make your escape!
       text: >
+        scene.flags.remove('AT_HOME');
         scene.flags.remove('THUGS_ARRIVED');
         '"Look!" You shout, pointing behind the thugs, "It\'s Skeeve, and he has a gun!"
 
@@ -213,6 +235,7 @@ scenes:
         WARNING: THIS CHOICE WILL END THE GAME."
       text: >
         scene.flags.remove('WITH_IVY');
+        scene.flags.add('FIND_SKEEVE');
         "You tell Ivy you're sure, take the information about Skeeve, and leave.
 
 
@@ -348,5 +371,36 @@ scenes:
     Be changed:
       desc: Sure. This is a situation that absolutely justifies letting your friend experiment on you with an alarmingly large machine.
       text: >
-        Ivy leads you down into the basement, where bright white lights illuminate an odd contraption about the size of a wardrobe.
-      next:
+        Ivy leads you down into the basement, where bright white lights illuminate an odd contraption about the size of
+        a wardrobe. She pours the rare powdered MacGuffinite into an intake funnel, and then opens up the door.
+
+        At her bidding you change into a fragile patient's gown that appears to be made out of paper. Once you've
+        changed, she delightedly straps you into the interior of the device. The padded insides of the machine are
+        surprisingly comfortable, and if Ivy's taken care with something as unimportant as comfort, then surely it must
+        be fine when it comes to big issues like safety... right?
+
+        She gives you a reassuring smile, then shuts the door with a clang.
+
+        You find yourself in a metal box, with loops of wire protruding from the walls and ceiling, the space
+        illuminated by blinking green lights.
+
+
+        You think you hear Ivy say something, but the sound is muffled by the machine and you can't make out what she's
+        saying. Then, the whole device begins to hum. Softly at first, then louder, then it begins to shake, rattling
+        your teeth. You can feel a buildup of charge in the air around you.
+
+        The humming stops for a moment, and you think the experiment's finished, but then a massive arc of some sort of
+        energy discharge blasts from top to bottom of the machine, rushing through you, apparently without causing any
+        damage. Lights flash in front of your eyes, and you feel an odd buzzing sensation throughout your body. Looking
+        down as far as the straps allow, you realise that the energy seems to have burnt your paper gown clean off your
+        body, transforming it into a few fragments of papery ash.
+
+
+        Before you have time to scream or thrash around, the energy flow slows and then stops. Ivy lets you out of the
+        machine and leads you to a full length mirror.
+
+        Standing naked in front of it, you look at your body. The body of a fit and healthy woman in her early twenties.
+
+
+        Ivy claps you on the back. "Complete success! Now, I'll just fill in the rest of your details for the ID. Could
+        you describe yourself in as much detail as possible?"

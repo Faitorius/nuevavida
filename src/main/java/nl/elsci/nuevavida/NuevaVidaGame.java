@@ -144,7 +144,7 @@ public class NuevaVidaGame extends Application {
                         setText(null);
                         setGraphic(null);
                     } else {
-                        setText(eval(item.toString()));
+                        setText(/*eval(*/item.toString()/*)*/);
                     }
                 }
             };
@@ -203,11 +203,10 @@ public class NuevaVidaGame extends Application {
 
     public void viewGameScene(GameScene scene) {
 
-        log.debug("switching to scene " + scene.getName());
+        log.debug("switching to scene " + scene.getTemplate().getName());
 
         currentGameScene = scene;
         sceneText.clear();
-        elp.defineBean("scene", scene);
         doTransition(scene.getStartTransition());
         primaryStage.setScene(sceneViewer);
     }

@@ -9,21 +9,23 @@ import java.util.List;
 
 @Data
 public class GameScene {
-    private String name;
     private final SceneTemplate template;
     private ELProcessor elp;
     private List<String> flags = new ArrayList<>();
+    private String lastAction;
 
     public GameScene(SceneTemplate template, ELProcessor elp) {
         this.template = template;
         this.elp = elp;
+        elp.defineBean("scene", this);
     }
 
     public Transition process(Action action) {
+        lastAction = action.getName();
         List<Action> actions = getActions(action.getNext());
         Transition transition = new Transition(action.getText(), actions);
-        if (action.getNext() == null || action.getNext().isEmpty()) {
-            transition.setNextScene(this);
+        if (actions.isEmpty()) {
+            transition.setNextScene(new GameScene(this.getTemplate(), this.getElp()));
         }
         return transition;
     }
@@ -47,7 +49,7 @@ public class GameScene {
                 }
                 Action action = template.getActions().get(eval);
                 if (action != null) {
-                    action.setName(actionName);
+                    action.setName(eval);
                     actions.add(action);
                 }
             }
