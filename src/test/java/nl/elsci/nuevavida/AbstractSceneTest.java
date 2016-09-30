@@ -7,7 +7,7 @@ import javax.el.ELException;
 import javax.el.ELProcessor;
 import java.util.Arrays;
 
-public class AbstractSceneTest {
+public abstract class AbstractSceneTest {
     private Configuration configuration;
     protected ELProcessor elp;
     protected SceneTemplate template;
