@@ -2,43 +2,24 @@ package nl.elsci.nuevavida;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-
-import javax.el.ELException;
-import javax.el.ELProcessor;
-import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
-public class IntroSceneTest {
-
-    private Configuration configuration;
-    private ELProcessor elp;
-    private SceneTemplate template;
-
-    private GameScene scene;
+public class IntroSceneTest extends AbstractSceneTest {
 
     public IntroSceneTest() {
-        Yaml yaml = new Yaml(new Constructor(Configuration.class));
-        configuration = yaml.loadAs(IntroSceneTest.class.getClass().getResourceAsStream("/intro.yml"), Configuration.class);
-        template = configuration.getScenes().get(0);
-
-        elp = new ELProcessor();
-        elp.defineBean("configuration", configuration);
+        super("intro", 0);
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
+        super.setUp();
 
         Player player = new Player();
         player.addTrait("BITCHY");
         elp.defineBean("player", player);
         elp.defineBean("gameData", new GameData());
-
-        scene = new GameScene(template, elp);
-        elp.defineBean("scene", scene);
     }
 
     @Test
@@ -102,34 +83,5 @@ public class IntroSceneTest {
         assertThat(transition.getActions().get(1).getName(), is("Offer sexual favours"));
         assertThat(transition.getActions().get(2).getName(), is("Beg"));
         assertThat(transition.getActions().get(3).getName(), is("Be murdered"));
-    }
-
-    private Transition process(String... actions) {
-        return process(scene.getStartTransition(), actions);
-    }
-
-    private Transition process(Transition transition, String... actions) {
-        if (actions.length > 0) {
-            eval(transition.getText());
-            for (Action action : transition.getActions()) {
-                if (action.getName().equals(actions[0])) {
-                    return process(scene.process(action), Arrays.copyOfRange(actions, 1, actions.length));
-                }
-            }
-            throw new RuntimeException("Unknown action: " + actions[0]);
-        } else {
-            return transition;
-        }
-    }
-
-    private String eval(String text) {
-        String eval;
-        try {
-            eval = (String) elp.eval(text);
-        } catch (ELException e) {
-//            e.printStackTrace();
-            eval = text;
-        }
-        return eval;
     }
 }

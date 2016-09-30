@@ -235,7 +235,6 @@ scenes:
         WARNING: THIS CHOICE WILL END THE GAME."
       text: >
         scene.flags.remove('WITH_IVY');
-        scene.flags.add('FIND_SKEEVE');
         "You tell Ivy you're sure, take the information about Skeeve, and leave.
 
 
