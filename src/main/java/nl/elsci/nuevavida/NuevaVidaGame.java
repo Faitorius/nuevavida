@@ -50,12 +50,7 @@ public class NuevaVidaGame extends Application {
     public NuevaVidaGame() {
 
         Yaml yaml = new Yaml(new Constructor(Configuration.class));
-        try {
-            configuration = yaml.loadAs(new FileReader("src/main/resources/intro.yml"), Configuration.class);
-        } catch (FileNotFoundException e) {
-            log.error("Unable to load configuration", e);
-            configuration = new Configuration();
-        }
+        configuration = yaml.loadAs(NuevaVidaGame.class.getClass().getResourceAsStream("/intro.yml"), Configuration.class);
 
         elp = new ELProcessor();
         Player player = new Player();

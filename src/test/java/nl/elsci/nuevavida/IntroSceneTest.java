@@ -7,13 +7,9 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import javax.el.ELException;
 import javax.el.ELProcessor;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.Arrays;
 
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 public class IntroSceneTest {
@@ -24,9 +20,9 @@ public class IntroSceneTest {
 
     private GameScene scene;
 
-    public IntroSceneTest() throws FileNotFoundException {
+    public IntroSceneTest() {
         Yaml yaml = new Yaml(new Constructor(Configuration.class));
-        configuration = yaml.loadAs(new FileReader("src/main/resources/intro.yml"), Configuration.class);
+        configuration = yaml.loadAs(IntroSceneTest.class.getClass().getResourceAsStream("/intro.yml"), Configuration.class);
         template = configuration.getScenes().get(0);
 
         elp = new ELProcessor();

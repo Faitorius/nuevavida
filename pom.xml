@@ -68,6 +68,7 @@
   </dependencies>
 
   <build>
+    <finalName>nuevavida</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -80,19 +81,32 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.6</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>nl.elsci.nuevavida.NuevaVidaGame</mainClass>
-            </manifest>
-          </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-        </configuration>
         <executions>
           <execution>
             <id>make-assembly</id>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>nl.elsci.nuevavida.NuevaVidaGame</mainClass>
+                </manifest>
+                <manifestEntries>
+                  <Class-Path>./</Class-Path>
+                </manifestEntries>
+              </archive>
+              <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>dist</id>
+            <configuration>
+              <descriptor>src/assembly/assembly.xml</descriptor>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
