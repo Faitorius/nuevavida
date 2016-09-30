@@ -13,6 +13,10 @@ public abstract class AbstractSceneTest {
     protected SceneTemplate template;
     private GameScene scene;
 
+    public AbstractSceneTest(String name) {
+        this(name, 0);
+    }
+
     public AbstractSceneTest(String name, int index) {
         Yaml yaml = new Yaml(new Constructor(Configuration.class));
         configuration = yaml.loadAs(AbstractSceneTest.class.getClass().getResourceAsStream("/" + name + ".yml"), Configuration.class);

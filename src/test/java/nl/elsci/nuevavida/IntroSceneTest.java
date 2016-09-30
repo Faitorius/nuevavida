@@ -9,7 +9,7 @@ import static org.junit.Assert.assertThat;
 public class IntroSceneTest extends AbstractSceneTest {
 
     public IntroSceneTest() {
-        super("intro", 0);
+        super("intro");
     }
 
     @Before
