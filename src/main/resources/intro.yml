@@ -20,7 +20,10 @@ scenes:
     ? '
 
     There\'s also a pair of criminal-looking thugs here, but let\'s not lower ourselves to detailed descriptions
-    of such scum.' : '')
+    of such scum.' : scene.flags.contains('WITH_IVY')
+    ? "
+
+    Ivy's also here. The only friend you can trust to help you hide from murderous thugs." : '')
   desc: >
     scene.flags.contains('THUGS_ARRIVED')
     ? 'You\'re at home, confronted with some rather unpleasant visitors.'
@@ -81,20 +84,6 @@ scenes:
       - "scene.flags.contains('BEGGED') ? '' : 'Beg'"
       - "scene.flags.contains('BE_MURDERED') ? '' : 'Be murdered'"
 
-    Escape!:
-      desc: Distract the thugs and make your escape!
-      text: >
-        scene.flags.remove('THUGS_ARRIVED');
-        '"Look!" You shout, pointing behind the thugs, "It\'s Skeeve, and he has a gun!"
-
-        The two morons turn to look, and quick as a flash you pop open a window and nimbly make your way out of it.
-
-
-        Half an hour later you stop to catch your breath. You\'ve lost the hoods, but whichever criminal organisation
-        they represent, they\'ll surely be on your tail. You need to get out of this town.'
-      next:
-      - Go to Ivy
-
     Offer sexual favours:
       desc: Offer to sleep with the thugs in exchange for forgetting about the money.
       text: >
@@ -135,6 +124,27 @@ scenes:
       - "scene.flags.contains('OFFERED_SEXUAL_FAVOURS') ? '' : 'Offer sexual favours'"
       - "scene.flags.contains('BEGGED') ? '' : 'Beg'"
 
+    Kill me already!:
+      desc: Well, if you're sure...
+      text: You tell Murderin' Mervin to just go ahead and murder you, so he does. Congratulations, you got the worst ending.
+
+
+        BAD END
+
+    Escape!:
+      desc: Distract the thugs and make your escape!
+      text: >
+        scene.flags.remove('THUGS_ARRIVED');
+        '"Look!" You shout, pointing behind the thugs, "It\'s Skeeve, and he has a gun!"
+
+        The two morons turn to look, and quick as a flash you pop open a window and nimbly make your way out of it.
+
+
+        Half an hour later you stop to catch your breath. You\'ve lost the hoods, but whichever criminal organisation
+        they represent, they\'ll surely be on your tail. You need to get out of this town.'
+      next:
+      - Go to Ivy
+
     Go to Ivy:
       desc: Take Ivy up on her offer and travel to her city.
       text: You find a payphone and sort out your travel arrangements. The next day, after a fearful night in a hotel,
@@ -145,3 +155,198 @@ scenes:
         and dreary place to live.
       next:
       - Take a taxi
+
+    Take a taxi:
+      desc: Take a taxi to Ivy's home.
+      text: The taxi lets you off outside Ivy's home and drives off.
+
+        Ivy's neighbourhood isn't what you were expecting. She lives well outside the town centre in a street of
+        run-down houses. You see several that are definitely abandoned, and  most of them are badly neglected. You know
+        that Ivy works as a research scientist, so you would have thought that she could afford to live in a nicer area.
+
+        Ivy's home stands out like a sore thumb in this grimy area. The street light next to you is broken, but even
+        in growing darkness you can see that it's clean and well maintained, with the front door painted a cheerful green.
+
+        You walk up to it and use the weighty metal knocker.
+      next:
+      - Wait for Ivy
+
+    Wait for Ivy:
+      desc: Wait for Ivy to answer the door.
+      text: >
+        scene.flags.add('WITH_IVY');
+        "You hear footsteps inside, and then Ivy opens the door. She smiles happily to see you. The two of you exchange
+        greetings and she invites you inside."
+      next:
+      - Explain your problems
+
+    Explain your problems:
+      desc: Tell Ivy all about your debt/murder troubles.
+      text: You sit down at the kitchen table and Ivy makes tea as you explain your problem to her. She taps away at a
+        shiny laptop as you speak, and soon finds details on this "Murderin' Mervin".
+
+        The information is not comforting. It seems he's part of the Railroad Gang, a criminal organisation with
+        international reach. He's been arrested several times for murder, assault and extortion but never convicted.
+        Not because he was innocent, but because judges have been bribed and juries intimidated.
+
+        Ivy shakes her head sadly. "I have a few connections, but no-one who can face down someone like this. Your best
+        bet is to go into hiding.
+
+        I know some backdoors to the ID databases and between that and a forger who owes me some favours, I could sort
+        you out with a new identity."
+      next:
+      - Get a new identity
+      - Find Skeeve
+
+    Find Skeeve:
+      desc: Start a new life? Here in Ivy's city? No way! You'll track down Skeeve instead!
+      text: You tell Ivy that you'd much rather track down this "Skeeve" fellow and make him pay, rather than going
+        into hiding. She manages to find some clues to where he might be on the computer, but warns you that this will
+        be a dangerous choice, and that you'd be better off making a new life here.
+      next:
+      - Get a new identity
+      - "Find Skeeve "
+
+    "Find Skeeve ":
+      desc: "Yes, you're sure. Forget starting a new life, hunting down your hapless former housemate is the thing to do.
+
+        WARNING: THIS CHOICE WILL END THE GAME."
+      text: >
+        scene.flags.remove('WITH_IVY');
+        "You tell Ivy you're sure, take the information about Skeeve, and leave.
+
+
+        A week later, you track him down, and show up unannounced at his front door. He looks at you with shock and
+        terror, too pathetic to even speak."
+      next:
+      - Take pity on him
+      - Make him pay
+      - Give him a thrashing
+
+    Take pity on him:
+      desc: Take pity on Skeeve and go on the run together.
+      text: >
+        Looking at him, you realise you don't have the heart to make this loser pay up. If Ivy found him, so can
+        Mervin, so you grab his arm and haul him out of his crappy hiding hole and onto the run with you.
+
+        Fleeing from murderous criminals, the two of you have many adventures, grow as people, learn new skills and
+        eventually form a special bond together. In time, your talents honed to a razor-edge from training in a lost
+        mountaintop ninja monastery, you confront Murderin\' Mervin and his boss in an epic confrontation.
+
+        But that is another story.
+
+
+        THE END
+
+    Give him a thrashing:
+      desc: Grab whatever implement is nearest to hand and use it to deliver a sound thrashing.
+      text: >
+        You muscle Skeeve into his hallway and grab the nearest implement, which turns out to be a broom. Using this
+        stout length of wood you hand out a painful beating.
+
+        Unfortunately, your victim's wails come to the attention of a passing police officer and you're arrested.
+
+        The judge sentences you to a secure women's prison. Soon you're locked away within its grim grey walls,
+        nothing to do except have pillow fights with your fellow inmates and soap up each others' breasts in the
+        showers. Truly, this is a hell on earth.
+
+
+        THE END
+
+    Make him pay:
+      desc: His debt, his payment. Force him to pay up, no matter what he has to do to get the money.
+      text: >
+        You demand that Skeeve pay his debt to the criminals. It turns out he can't afford it, so you force him into
+        sex work to raise the money. Before long you've become a successful pimp, with a large entourage of sexy
+        man-whores. Skeeve is your best and most popular rent boy, and comes to love the prostitute lifestyle.
+
+        Even when the debt is paid off, Skeeve keeps on working as a streetwalker. You find yourself feeling
+        increasingly strange about it though, and eventually you realise that all the time you were pimping him out you
+        were also falling in love with him.
+
+        Luckily you can take the pimping solution of claiming him as your personal sex toy, something Skeeve has no
+        problem with whatsoever.
+
+        You're very happy with your new life, and don't even mind when your friend Ivy browbeats Skeeve into helping
+        with one of her inventions and he ends up pregnant. Still, you do sometimes wonder how things would have turned
+        out if you'd gone into hiding in Ivy's city instead.
+
+
+        THE END
+
+    Get a new identity:
+      desc: Get a new identity", "Yes! This is the perfect solution
+      text: >
+        Ivy types away at her computer for a bit, and sends some messages to a forger she has some sort of connection with.
+
+        Eventually she looks up from the screen and eyes you speculatively. "Well, I can get you a new identity, but
+        there are a few things that we can't really hack in the system. This ID I have is for someone in their early
+        twenties. Can you pull that off?"
+      next:
+      - Sure
+      - No way!
+
+    Sure:
+      desc: Early twenties? Sure. That's exactly how you look.
+      text: >
+        "Okay, that's good. Now, let's see, it seems there's another limitation here."
+
+        She types away for a few more minutes. "Ah, the medical records can't be completely changed. It says here
+        you're in good physical shape. Would you say that fits your description?"
+      next:
+      - Yes
+      - No
+
+    No way!:
+      desc: Early twenties?? You don't look even close to that young.
+      text: >
+        scene.flags.add('CHANGE_NEEDED');
+        "\"Oh dear. We'll have to do something about that. There seems to be another limitation here too.\"
+
+        She types away for a few more minutes. \"Ah, the medical records can't be completely changed. It says here
+        you're in good physical shape. Would you say that fits your description?\""
+      next:
+      - Yes
+      - No
+
+    Yes:
+      desc: Healthy and in good shape? Of course.
+      text: >
+        "\"Great! Congratulations on staying in shape. That'll make things easier.\"
+
+
+        ".concat(scene.flags.contains('CHANGE_NEEDED')
+        ? "\"Okay, there are some areas where you don't match your ID. That's a problem and I can't change the ID any
+        further. That means we need to change you.\"
+
+        \"I do have a sample of MacGuffinite from my work for the government. It's quite rare and hard to find, but
+        friends are more important than unusual chemical substances. If I use this with the machine I was trying to use
+        to cure baldness, I can make some changes to your physical structure.\""
+        : "\"Well, it seems like your ID fits you well enough. Now, I'll need to enter the details into the system.
+        Could you describe yourself in as much detail as possible?\"")
+      next:
+      - >
+        scene.flags.contains('CHANGE_NEEDED') ? 'Be changed' : ''
+
+    No:
+      desc: Nope. You don't have a healthy lifestyle at all and it's obvious from looking at you.
+      text: >
+        scene.flags.add('CHANGE_NEEDED');
+        "\"Okay. That's something we'll need to sort out.\"
+
+
+        \"Okay, there are some areas where you don't match your ID. That's a problem and I can't change the ID any
+        further. That means we need to change you.\"
+
+        \"I do have a sample of MacGuffinite from my work for the government. It's quite rare and hard to find, but
+        friends are more important than unusual chemical substances. If I use this with the machine I was trying to use
+        to cure baldness, I can make some changes to your physical structure.\""
+      next:
+      - >
+        scene.flags.contains('CHANGE_NEEDED') ? 'Be changed' : ''
+
+    Be changed:
+      desc: Sure. This is a situation that absolutely justifies letting your friend experiment on you with an alarmingly large machine.
+      text: >
+        Ivy leads you down into the basement, where bright white lights illuminate an odd contraption about the size of a wardrobe.
+      next:
