@@ -17,25 +17,23 @@ events:
 #    eligible:
 
 scenes:
-  - name: defaultScene
-
-  - name: Cute Cake
-    desc: It's the late afternoon, and you're out in town on your daily business, walking along feeling stressed out as
+  defaultScene:
+    intro: It's the late afternoon, and you're out in town on your daily business, walking along feeling stressed out as
       usual. Even though you aren't really in a rush, your general feelings of frustration make you hurry home, and so
       you take a shortcut down a small side-street. You're not really paying attention as you walk along, and so you're
       taken by surprise about halfway down the alley when a figure reaches out from a doorway to lay a hand lightly on
       your arm.
     people:
     actions:
-      - name: Move away
+      Move away:
         desc: Yikes! This is a startling thing to happen! Still, maybe it's perfectly innocent. Take a step away to get
               a bit of distance between you and ask this stranger what they want.
         text: You move to step away from the figure, but they say something that you don't quite catch in your rising
               panic, and jab their hand towards you. You do a double take, and realise that they're holding a cake.
         next:
-        - '''Cake?'''
+        - Cake?
 
-      - name: Cake?
+      Cake?:
         desc: >
           'Oh no! Maybe you should run for help before you get stab... wait, a cake? That\'s not dangerous at all!'
         text: >
@@ -48,17 +46,14 @@ scenes:
           "Oh my, I didn\'t scare you did I?" She says, "I just thought you looked so awfully down in the dumps, and
           perhaps one of our cupcakes might cheer you up."'
         next:
-        - >
-          'Eat the cake'
-        - >
-          'No thanks'
-        - >
-          player.traits.contains('BITCHY') ? 'Throw it in her face' : ''
+        - Eat the cake
+        - No thanks
+        - "player.traits.contains('BITCHY') ? 'Throw it in her face' : ''"
 
-      - name: Eat the cake
+      Eat the cake:
         desc: Free cake? That's your favourite kind!
 
-      - name: No thanks
+      No thanks:
         desc: Offering you free cake? No thank you!
         text: >
           gameData.addFlag('CUTE_CAKE_REJECTED');
@@ -71,23 +66,23 @@ scenes:
 
           : 'You politely decline the baker\'s offer, and get back on your way home.'
 
-      - name: Throw it in her face
+      Throw it in her face:
         desc: Offering you free cake? How dare she! Throw it right in her cake-making face. That'll teach her.
 
-      - name: Say goodbye
+      Say goodbye:
         desc: Say goodbye and be on your way back home.
 
-      - name: Offer to model
+      Offer to model:
         desc: They just need a better model for their poster... you could do it!
 
-      - name: Model for the bakery
+      Model for the bakery:
         desc: Isn't it every girl's dream to model with a cupcake? Go for it!
 
-      - name: No thanks!
+      No thanks!:
         desc: Having your face up in a bakery for everyone to look at? No thank you!
 
-      - name: Buy a cake
+      Buy a cake:
         desc: Buy one of their delicious cupcakes.
 
-      - name: Continue home
+      Continue home:
         desc: Continue on your way home.

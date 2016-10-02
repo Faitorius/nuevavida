@@ -13,8 +13,16 @@ public class GameScene {
     private ELProcessor elp;
     private List<String> flags = new ArrayList<>();
     private String lastAction;
+    private ResultListener listener;
+    private Result result;
 
-    public GameScene(SceneTemplate template, ELProcessor elp) {
+    public GameScene(ResultListener listener, SceneTemplate template, ELProcessor elp) {
+        this(listener, new Result(), template, elp);
+    }
+
+    public GameScene(ResultListener listener, Result result, SceneTemplate template, ELProcessor elp) {
+        this.listener = listener;
+        this.result = result;
         this.template = template;
         this.elp = elp;
         elp.defineBean("scene", this);
@@ -23,11 +31,7 @@ public class GameScene {
     public Transition process(Action action) {
         lastAction = action.getName();
         List<Action> actions = getActions(action.getNext());
-        Transition transition = new Transition(action.getText(), actions);
-        if (actions.isEmpty()) {
-            transition.setNextScene(new GameScene(this.getTemplate(), this.getElp()));
-        }
-        return transition;
+        return new Transition(action.getText(), actions);
     }
 
     public Transition getStartTransition() {
@@ -55,5 +59,9 @@ public class GameScene {
             }
         }
         return actions;
+    }
+
+    public void notifyListener() {
+        listener.listen(result);
     }
 }

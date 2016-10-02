@@ -1,34 +1,41 @@
 package nl.elsci.nuevavida;
 
+import org.mockito.Mockito;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import javax.el.ELException;
 import javax.el.ELProcessor;
 import java.util.Arrays;
 
 public abstract class AbstractSceneTest {
-    private Configuration configuration;
-    protected ELProcessor elp;
+    private final Configuration configuration;
+    protected final ELProcessor elp;
     protected SceneTemplate template;
     private GameScene scene;
 
     public AbstractSceneTest(String name) {
-        this(name, 0);
-    }
-
-    public AbstractSceneTest(String name, int index) {
         Yaml yaml = new Yaml(new Constructor(Configuration.class));
-        configuration = yaml.loadAs(AbstractSceneTest.class.getClass().getResourceAsStream("/" + name + ".yml"), Configuration.class);
 
-        template = configuration.getScenes().get(index);
+        configuration = yaml.loadAs(AbstractSceneTest.class.getClass().getResourceAsStream("/config.yml"), Configuration.class);
+        for (String file : configuration.getFiles()) {
+            try {
+                configuration.merge(yaml.loadAs(AbstractSceneTest.class.getClass().getResourceAsStream("/" + file), Configuration.class));
+            } catch (YAMLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        template = configuration.getScenes().get(name);
 
         elp = new ELProcessor();
         elp.defineBean("configuration", configuration);
     }
 
     public void setUp() {
-        scene = new GameScene(template, elp);
+        ResultListener listener = Mockito.mock(ResultListener.class);
+        scene = new GameScene(listener, template, elp);
         elp.defineBean("scene", scene);
     }
 
@@ -60,5 +67,4 @@ public abstract class AbstractSceneTest {
         }
         return eval;
     }
-
 }

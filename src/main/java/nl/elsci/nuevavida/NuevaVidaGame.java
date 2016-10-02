@@ -8,7 +8,10 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -16,15 +19,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import javax.el.ELException;
 import javax.el.ELProcessor;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 
-public class NuevaVidaGame extends Application {
+public class NuevaVidaGame extends Application implements ResultListener {
 
     private static final Logger log = LoggerFactory.getLogger(NuevaVidaGame.class);
+    private final GameData gameData;
 
     private Stage primaryStage;
 
@@ -36,8 +40,8 @@ public class NuevaVidaGame extends Application {
     private MultipleSelectionModel<Action> selectionModel;
 
     private GameScene currentGameScene;
-    private Action finishedAction;
-    private Transition transition;
+    private final Action finishedAction;
+    private final Action proceedAction;
 
     private Configuration configuration;
     private ComboBox<Activity> dateActivityComboBox;
@@ -46,23 +50,39 @@ public class NuevaVidaGame extends Application {
     private ComboBox<Activity> weekendActivityComboBox;
 
     private ELProcessor elp;
+    private TextArea weekInfoText;
+    private GameScene nextGameScene;
+
+    private Action lastAction;
 
     public NuevaVidaGame() {
-
         Yaml yaml = new Yaml(new Constructor(Configuration.class));
-        configuration = yaml.loadAs(NuevaVidaGame.class.getClass().getResourceAsStream("/intro.yml"), Configuration.class);
+        configuration = yaml.loadAs(NuevaVidaGame.class.getClass().getResourceAsStream("/config.yml"), Configuration.class);
+        for (String file : configuration.getFiles()) {
+            log.debug("loading " + file);
+            try {
+                configuration.merge(yaml.loadAs(NuevaVidaGame.class.getClass().getResourceAsStream("/" + file), Configuration.class));
+            } catch (YAMLException e) {
+                e.printStackTrace();
+            }
+        }
 
         elp = new ELProcessor();
         Player player = new Player();
         player.addTrait("BITCHY");
         elp.defineBean("player", player);
         elp.defineBean("configuration", configuration);
-        elp.defineBean("gameData", new GameData());
+        gameData = new GameData();
+        elp.defineBean("gameData", gameData);
 
 
         finishedAction = new Action();
         finishedAction.setName("Finished");
         finishedAction.setDesc("End the scene and move on to the next event, or to the next week if this is this week's last event.");
+
+        proceedAction = new Action();
+        proceedAction.setName("Proceed");
+        proceedAction.setDesc("Proceed to the next scene");
     }
 
     @Override
@@ -73,9 +93,9 @@ public class NuevaVidaGame extends Application {
         weekPlannerScene = createWeekPlanner();
         sceneViewer = createSceneViewer();
 
-        GameScene gameScene = new GameScene(configuration.getScenes().get(0), elp);
+        GameScene gameScene = new GameScene(this, configuration.getScenes().get("Intro"), elp);
         viewGameScene(gameScene);
-//        viewWeekPlanner(new WeekStartInfo());
+//        viewWeekPlanner(gameData.getWeekStartInfo());
 
         primaryStage.show();
     }
@@ -139,7 +159,7 @@ public class NuevaVidaGame extends Application {
                         setText(null);
                         setGraphic(null);
                     } else {
-                        setText(/*eval(*/item.toString()/*)*/);
+                        setText(item.toString());
                     }
                 }
             };
@@ -147,11 +167,7 @@ public class NuevaVidaGame extends Application {
             return cell;
         });
         selectionModel = listView.getSelectionModel();
-        selectionModel.selectedItemProperty().
-
-                addListener(($1, $2, newValue) ->
-
-                {
+        selectionModel.selectedItemProperty().addListener(($1, $2, newValue) -> {
                     if (newValue != null) {
                         descTextArea.setText(newValue.getDesc());
                     } else {
@@ -163,20 +179,20 @@ public class NuevaVidaGame extends Application {
         bottomGrid.add(listView, 0, 0);
         bottomGrid.add(descTextArea, 1, 0);
         Button actionButton = new Button("Take Action");
-        actionButton.setFont(Font.font(Font.getDefault().
-
-                getFamily(), FontWeight.BOLD, 20));
+        actionButton.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 20));
         actionButton.setPrefSize(200, 220);
-        actionButton.setOnAction(event ->
-
-        {
+        actionButton.setOnAction(event -> {
             Action selectedItem = listView.getSelectionModel().getSelectedItem();
+            lastAction = selectedItem;
             if (selectedItem == finishedAction) {
-                if (transition.getNextScene() != null) {
-                    viewGameScene(transition.getNextScene());
-                } else {
-                    viewWeekPlanner(new WeekStartInfo());//TODO
-                }
+                clearSceneViewer();
+                GameScene scene = this.currentGameScene;
+                currentGameScene = null;
+                scene.notifyListener();
+            } else if (selectedItem == proceedAction && nextGameScene != null) {
+                GameScene scene = nextGameScene;
+                nextGameScene = null;
+                viewGameScene(scene);
             } else if (selectedItem != null) {
                 doTransition(currentGameScene.process(selectedItem));
             }
@@ -184,14 +200,29 @@ public class NuevaVidaGame extends Application {
 
         bottomGrid.add(actionButton, 2, 0);
 
-        return new
+        return new Scene(pane, 1000, 710);
+    }
 
-                Scene(pane, 1000, 710);
-
+    private void clearSceneViewer() {
+        sceneText.clear();
+        actionList.clear();
     }
 
     private void viewWeekPlanner(WeekStartInfo weekStartInfo) {
-        //TODO
+
+        workActivityComboBox.getItems().setAll(weekStartInfo.getWorkActivities());
+        workActivityComboBox.getSelectionModel().select(0);
+
+        freeTimeActivityComboBox.getItems().setAll(weekStartInfo.getFreeTimeActivities());
+        freeTimeActivityComboBox.getSelectionModel().select(0);
+
+        dateActivityComboBox.getItems().setAll(weekStartInfo.getGoingOutActivities());
+        dateActivityComboBox.getSelectionModel().select(0);
+
+        weekendActivityComboBox.getItems().setAll(weekStartInfo.getWeekendActivities());
+        weekendActivityComboBox.getSelectionModel().select(0);
+
+        weekInfoText.setText(weekStartInfo.getWeekInfo());
 
         primaryStage.setScene(weekPlannerScene);
     }
@@ -201,20 +232,28 @@ public class NuevaVidaGame extends Application {
         log.debug("switching to scene " + scene.getTemplate().getName());
 
         currentGameScene = scene;
-        sceneText.clear();
+        clearSceneViewer();
         doTransition(scene.getStartTransition());
         primaryStage.setScene(sceneViewer);
     }
 
     private void doTransition(Transition transition) {
-        this.transition = transition;
         String text = eval(transition.getText());
         appendText(text);
-        actionList.setAll(transition.getActions());
-        if (actionList.size() == 0) {
-            actionList.add(finishedAction);
+
+        if (transition.getNextScene() != null) {
+            actionList.setAll(proceedAction);
+            nextGameScene = transition.getNextScene();
+        } else if (transition.getActions().size() == 0) {
+            actionList.setAll(finishedAction);
+        } else {
+            actionList.setAll(transition.getActions());
         }
-        selectionModel.select(0);
+        if (actionList.contains(lastAction)) {
+            selectionModel.select(lastAction);
+        } else {
+            selectionModel.select(0);
+        }
     }
 
     private void appendText(String text) {
@@ -271,28 +310,28 @@ public class NuevaVidaGame extends Application {
         grid.add(freeTimeActivityComboBox, 1, 1);
         grid.add(createOutfitComboBox(), 2, 1);
 
-        weekendActivityComboBox = new ComboBox<>();
-        weekendActivityComboBox.setPrefWidth(150);
-        Label weekendLabel = new Label("Weekend Activity:");
-        weekendLabel.setPrefWidth(175);
-        weekendLabel.setLabelFor(weekendActivityComboBox);
-
-        grid.add(weekendLabel, 0, 2);
-        grid.add(weekendActivityComboBox, 1, 2);
-        grid.add(createOutfitComboBox(), 2, 2);
-
         dateActivityComboBox = new ComboBox<>();
         dateActivityComboBox.setPrefWidth(150);
         Label dateLabel = new Label("Weekend Evening Activity:");
         dateLabel.setPrefWidth(175);
         dateLabel.setLabelFor(dateActivityComboBox);
 
-        grid.add(dateLabel, 0, 3);
-        grid.add(dateActivityComboBox, 1, 3);
+        grid.add(dateLabel, 0, 2);
+        grid.add(dateActivityComboBox, 1, 2);
+        grid.add(createOutfitComboBox(), 2, 2);
+
+        weekendActivityComboBox = new ComboBox<>();
+        weekendActivityComboBox.setPrefWidth(150);
+        Label weekendLabel = new Label("Weekend Activity:");
+        weekendLabel.setPrefWidth(175);
+        weekendLabel.setLabelFor(weekendActivityComboBox);
+
+        grid.add(weekendLabel, 0, 3);
+        grid.add(weekendActivityComboBox, 1, 3);
         grid.add(createOutfitComboBox(), 2, 3);
 
         Button startWeekButton = new Button("Start Week");
-        startWeekButton.setFont(new Font("Tahoma", 14));
+        startWeekButton.setFont(Font.font("Tahoma", FontWeight.BOLD, 14));
         startWeekButton.setOnAction(event -> {/*todo*/});
 
         FlowPane flowPane = new FlowPane(Orientation.VERTICAL);
@@ -308,12 +347,14 @@ public class NuevaVidaGame extends Application {
 
         borderPane.setTop(flowPane);
 
-        TextArea weekInfoText = new TextArea("Week 2\n\n\n" +
-                "Your stress remains unchanged this week at 0");
+        weekInfoText = new TextArea();
         weekInfoText.setEditable(false);
+        weekInfoText.setFont(Font.font("Tahoma", 16));
+        weekInfoText.setWrapText(true);
+
         borderPane.setCenter(weekInfoText);
 
-        return new Scene(borderPane, 800, 600);
+        return new Scene(borderPane, 1000, 710);
     }
 
     private ComboBox<String> createOutfitComboBox() {
@@ -326,5 +367,12 @@ public class NuevaVidaGame extends Application {
 
     public static void main(String[] args) throws FileNotFoundException {
         launch(args);
+    }
+
+    @Override
+    public void listen(Result result) {
+        log.debug("going to next week!");
+        gameData.endWeek();
+        viewWeekPlanner(gameData.getWeekStartInfo());
     }
 }
