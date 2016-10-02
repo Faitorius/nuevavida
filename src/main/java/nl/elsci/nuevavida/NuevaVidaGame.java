@@ -23,7 +23,8 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import javax.el.ELException;
 import javax.el.ELProcessor;
-import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NuevaVidaGame extends Application implements ResultListener {
 
@@ -55,7 +56,11 @@ public class NuevaVidaGame extends Application implements ResultListener {
 
     private Action lastAction;
 
+    public static NuevaVidaGame instance;
+    private ComboBox<String> workOutfitComboBox;
+
     public NuevaVidaGame() {
+        instance = this;
         Yaml yaml = new Yaml(new Constructor(Configuration.class));
         configuration = yaml.loadAs(NuevaVidaGame.class.getClass().getResourceAsStream("/config.yml"), Configuration.class);
         for (String file : configuration.getFiles()) {
@@ -93,8 +98,9 @@ public class NuevaVidaGame extends Application implements ResultListener {
         weekPlannerScene = createWeekPlanner();
         sceneViewer = createSceneViewer();
 
-        GameScene gameScene = new GameScene(this, configuration.getScenes().get("Intro"), elp);
-        viewGameScene(gameScene);
+        Scheduler intro = new FullFemaleIntro();
+        intro.setListener(this);
+
 //        viewWeekPlanner(gameData.getWeekStartInfo());
 
         primaryStage.show();
@@ -227,6 +233,10 @@ public class NuevaVidaGame extends Application implements ResultListener {
         primaryStage.setScene(weekPlannerScene);
     }
 
+    public void viewGameScene(String name) {
+        viewGameScene(new GameScene(this, configuration.getScenes().get(name), elp));
+    }
+
     public void viewGameScene(GameScene scene) {
 
         log.debug("switching to scene " + scene.getTemplate().getName());
@@ -298,7 +308,8 @@ public class NuevaVidaGame extends Application implements ResultListener {
 
         grid.add(workLabel, 0, 0);
         grid.add(workActivityComboBox, 1, 0);
-        grid.add(createOutfitComboBox(), 2, 0);
+        workOutfitComboBox = createOutfitComboBox();
+        grid.add(workOutfitComboBox, 2, 0);
 
         freeTimeActivityComboBox = new ComboBox<>();
         freeTimeActivityComboBox.setPrefWidth(150);
@@ -332,7 +343,16 @@ public class NuevaVidaGame extends Application implements ResultListener {
 
         Button startWeekButton = new Button("Start Week");
         startWeekButton.setFont(Font.font("Tahoma", FontWeight.BOLD, 14));
-        startWeekButton.setOnAction(event -> {/*todo*/});
+        startWeekButton.setOnAction(event -> {
+            List<Activity> activities = new ArrayList<>();
+            Activity activity = workActivityComboBox.getSelectionModel().getSelectedItem();
+//TODO            activity.setOutfit(workOutfitComboBox.getSelectionModel().getSelectedItem());
+            activities.add(activity);
+            activities.add(freeTimeActivityComboBox.getSelectionModel().getSelectedItem());
+            activities.add(dateActivityComboBox.getSelectionModel().getSelectedItem());
+            activities.add(weekendActivityComboBox.getSelectionModel().getSelectedItem());
+            new WeekRunner(gameData, activities).setListener(this);
+        });
 
         FlowPane flowPane = new FlowPane(Orientation.VERTICAL);
         flowPane.setVgap(10);
@@ -365,14 +385,25 @@ public class NuevaVidaGame extends Application implements ResultListener {
         return freeTimeOutfitComboBox;
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void listen(Result result) {
         log.debug("going to next week!");
-        gameData.endWeek();
+        gameData.incrementWeek();
         viewWeekPlanner(gameData.getWeekStartInfo());
+    }
+
+    public static void startGame(Player player, int gameLength) {
+        //TODO create outfits
+        //TODO create NPCs
+        //TODO create gameData
+        //TODO set money
+    }
+
+    interface FemaleChargenListener {
+        void template(FemaleTemplate template);
     }
 }

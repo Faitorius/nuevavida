@@ -79,7 +79,7 @@ public class GameData {
         return new WeekStartInfo(workActivities, freeTimeActivities, goingOutActivities, weekendActivities, weekInfo);
     }
 
-    public void endWeek() {
+    public void incrementWeek() {
         currentWeek++;
         weekInfo = "Week " + currentWeek + "\n";
         weekInfo += player.getWeekUpdate();

@@ -23,6 +23,8 @@ public class Event implements ResultListener {
         List npcs = new ArrayList();
 //        Scene scene = new Scene(player, npcs, this);
 //        viewScene(scene, listener);
+
+        listener.listen(result);//TODO
     }
 
     private void viewScene(GameScene scene, ResultListener listener) {

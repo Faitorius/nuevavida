@@ -32,8 +32,19 @@ public class Player {
 
         // TODO children
 
+        // TODO friends
+        update += "\n\n";
+
         if (stressChange != 0) {
-            // TODO stress
+            stress += stressChange;
+            stress = Math.max(stress, 0);
+            stress = Math.min(stress, 100);
+            if (stressChange > 0) {
+                update += "Last week you suffered " + stressChange + " points of stress and your stress total is now " + stress;
+            } else {
+                update += "Last week your stress changed by " + stressChange + " and your stress total is now " + stress;
+            }
+            stressChange = 0;
         } else {
             update += "Your stress remains unchanged this week at " + stress;
         }
