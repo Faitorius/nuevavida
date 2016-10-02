@@ -15,6 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -26,9 +27,9 @@ import javax.el.ELProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class NuevaVidaGame extends Application implements ResultListener {
 
-    private static final Logger log = LoggerFactory.getLogger(NuevaVidaGame.class);
     private final GameData gameData;
 
     private Stage primaryStage;
@@ -71,13 +72,14 @@ public class NuevaVidaGame extends Application implements ResultListener {
                 e.printStackTrace();
             }
         }
+        log.debug(configuration.toString());
 
         elp = new ELProcessor();
         Player player = new Player();
         player.addTrait("BITCHY");
         elp.defineBean("player", player);
         elp.defineBean("configuration", configuration);
-        gameData = new GameData();
+        gameData = new GameData(configuration, elp);
         elp.defineBean("gameData", gameData);
 
 
@@ -239,7 +241,7 @@ public class NuevaVidaGame extends Application implements ResultListener {
 
     public void viewGameScene(GameScene scene) {
 
-        log.debug("switching to scene " + scene.getTemplate().getName());
+        log.debug("switching to new scene");
 
         currentGameScene = scene;
         clearSceneViewer();

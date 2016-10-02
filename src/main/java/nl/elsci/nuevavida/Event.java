@@ -13,9 +13,13 @@ public class Event implements ResultListener {
     private ResultListener listener;
     private Result result = new Result();
     private EventTemplate eventTemplate;
+    private Configuration configuration;
+    private ELProcessor elp;
 
-    public Event(EventTemplate eventTemplate) {
+    public Event(EventTemplate eventTemplate, Configuration configuration, ELProcessor elp) {
         this.eventTemplate = eventTemplate;
+        this.configuration = configuration;
+        this.elp = elp;
     }
 
     public void occur(Outfit outfit, ResultListener listener) {
@@ -24,12 +28,15 @@ public class Event implements ResultListener {
 //        Scene scene = new Scene(player, npcs, this);
 //        viewScene(scene, listener);
 
-        listener.listen(result);//TODO
+        GameScene scene = new GameScene(this, configuration.getScenes().get(eventTemplate.getScene()), elp);
+        viewScene(scene, this);
+
+//        listener.listen(result);//TODO
     }
 
     private void viewScene(GameScene scene, ResultListener listener) {
         this.listener = listener;
-
+        NuevaVidaGame.instance.viewGameScene(scene);
     }
 
     public int getWeight() {
@@ -49,5 +56,7 @@ public class Event implements ResultListener {
     public void listen(Result sceneResult) {
         listener.listen(sceneResult);
         listener.listen(result);
+        listener = null;//TODO ??
+        result = null;//TODO ??
     }
 }

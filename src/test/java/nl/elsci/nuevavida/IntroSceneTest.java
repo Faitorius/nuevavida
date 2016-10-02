@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class IntroSceneTest extends AbstractSceneTest {
 
@@ -19,7 +20,8 @@ public class IntroSceneTest extends AbstractSceneTest {
         Player player = new Player();
         player.addTrait("BITCHY");
         elp.defineBean("player", player);
-        elp.defineBean("gameData", new GameData());
+        GameData gameData = mock(GameData.class);
+        elp.defineBean("gameData", gameData);
     }
 
     @Test

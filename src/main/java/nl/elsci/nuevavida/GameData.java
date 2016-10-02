@@ -2,8 +2,10 @@ package nl.elsci.nuevavida;
 
 import lombok.Getter;
 
+import javax.el.ELProcessor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameData {
 
@@ -12,33 +14,47 @@ public class GameData {
     private int currentWeek;
     private String weekInfo;
     private Player player = new Player(); //TODO
+    private Configuration configuration;
+    private ELProcessor elp;
+
+    public GameData(Configuration configuration, ELProcessor elp) {
+        this.configuration = configuration;
+        this.elp = elp;
+    }
 
     public WeekStartInfo getWeekStartInfo() {
         List<Activity> workActivities = new ArrayList<>();
         Activity activity = new Activity();
         activity.setName("Go to work");
         activity.setOutfitType(OutfitType.BUSINESS);
-        activity.getEvents().add(new Event(new EventTemplate()));
+//        activity.getEvents().add(new Event(new EventTemplate(), configuration, elp));
         workActivities.add(activity);
 
         List<Activity> freeTimeActivities = new ArrayList<>();
 
+        List<Event> freeTimeEvents = new ArrayList<>();
+        for (Map.Entry<String, EventTemplate> entry : configuration.getEvents().entrySet()) {
+            if (entry.getValue().getActivityTypes().contains("Free time")) {
+                freeTimeEvents.add(new Event(entry.getValue(), configuration, elp));
+            }
+        }
+
         activity = new Activity();
         activity.setName("Relax at home");
         activity.setOutfitType(OutfitType.CASUAL);
-        activity.getEvents().add(new Event(new EventTemplate()));
+        activity.setEvents(freeTimeEvents);
 
         freeTimeActivities.add(activity);
         activity = new Activity();
         activity.setName("Explore your body");
         activity.setOutfitType(OutfitType.CASUAL);
-        activity.getEvents().add(new Event(new EventTemplate()));
+//        activity.getEvents().add(new Event(new EventTemplate(), configuration, elp));
 
         freeTimeActivities.add(activity);
         activity = new Activity();
         activity.setName("Study fashion");
         activity.setOutfitType(OutfitType.CASUAL);
-        activity.getEvents().add(new Event(new EventTemplate()));
+//        activity.getEvents().add(new Event(new EventTemplate(), configuration, elp));
 
         freeTimeActivities.add(activity);
 
@@ -47,13 +63,13 @@ public class GameData {
         activity = new Activity();
         activity.setName("Stay at home");
         activity.setOutfitType(OutfitType.CASUAL);
-        activity.getEvents().add(new Event(new EventTemplate()));
+//        activity.getEvents().add(new Event(new EventTemplate(), configuration, elp));
 
         goingOutActivities.add(activity);
         activity = new Activity();
         activity.setName("Go Clubbing");
         activity.setOutfitType(OutfitType.CLUBBING);
-        activity.getEvents().add(new Event(new EventTemplate()));
+//        activity.getEvents().add(new Event(new EventTemplate(), configuration, elp));
 
         goingOutActivities.add(activity);
         List<Activity> weekendActivities = new ArrayList<>();
@@ -61,19 +77,19 @@ public class GameData {
         activity = new Activity();
         activity.setName("Relax at home");
         activity.setOutfitType(OutfitType.CASUAL);
-        activity.getEvents().add(new Event(new EventTemplate()));
+//        activity.getEvents().add(new Event(new EventTemplate(), configuration, elp));
 
         weekendActivities.add(activity);
         activity = new Activity();
         activity.setName("Go Shopping");
         activity.setOutfitType(OutfitType.CASUAL);
-        activity.getEvents().add(new Event(new EventTemplate()));
+//        activity.getEvents().add(new Event(new EventTemplate(), configuration, elp));
 
         weekendActivities.add(activity);
         activity = new Activity();
         activity.setName("Shop for your flat");
         activity.setOutfitType(OutfitType.CASUAL);
-        activity.getEvents().add(new Event(new EventTemplate()));
+//        activity.getEvents().add(new Event(new EventTemplate(), configuration, elp));
 
         weekendActivities.add(activity);
         return new WeekStartInfo(workActivities, freeTimeActivities, goingOutActivities, weekendActivities, weekInfo);

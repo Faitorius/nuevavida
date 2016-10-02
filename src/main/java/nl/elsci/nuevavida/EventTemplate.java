@@ -2,15 +2,13 @@ package nl.elsci.nuevavida;
 
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.List;
 
 @Data
 public class EventTemplate {
     private String name;
-    private List<String> scenes;
+    private String scene;
     private String weight;
-
-    public String getWeight() {
-        return weight;
-    }
+    private List<String> activityTypes;
 }

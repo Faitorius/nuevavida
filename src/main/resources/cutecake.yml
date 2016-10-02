@@ -1,35 +1,30 @@
-activities:
-  - name: go to work
-#    outfittypes:
-#      - casual
-    events:
-      - defaultEvent
-
 events:
-  - name: defaultEvent
-    scenes:
-      - defaultScene
-    weight: configuration.activities[0].name
-  - name: Cute Cake
-    scenes:
-      - Cute Cake
-    weight: 'gameData.flags.contains(''CUTE_CAKE_MODEL'') ? 80 : 50'
-#    eligible:
+  Cute Cake:
+    scene: Cute Cake
+    weight: "gameData.flags.contains('CUTE_CAKE_MODEL') ? 80 : 50"
+    activityTypes:
+    - Free time
 
 scenes:
-  defaultScene:
-    intro: It's the late afternoon, and you're out in town on your daily business, walking along feeling stressed out as
+  Cute Cake:
+    intro: >
+      It's the late afternoon, and you're out in town on your daily business, walking along feeling stressed out as
       usual. Even though you aren't really in a rush, your general feelings of frustration make you hurry home, and so
       you take a shortcut down a small side-street. You're not really paying attention as you walk along, and so you're
       taken by surprise about halfway down the alley when a figure reaches out from a doorway to lay a hand lightly on
       your arm.
+    introActions:
+    - Move away
     people:
+    desc:
     actions:
       Move away:
-        desc: Yikes! This is a startling thing to happen! Still, maybe it's perfectly innocent. Take a step away to get
-              a bit of distance between you and ask this stranger what they want.
-        text: You move to step away from the figure, but they say something that you don't quite catch in your rising
-              panic, and jab their hand towards you. You do a double take, and realise that they're holding a cake.
+        desc: >
+          Yikes! This is a startling thing to happen! Still, maybe it's perfectly innocent. Take a step away to get
+          a bit of distance between you and ask this stranger what they want.
+        text: >
+          You move to step away from the figure, but they say something that you don't quite catch in your rising
+          panic, and jab their hand towards you. You do a double take, and realise that they're holding a cake.
         next:
         - Cake?
 
@@ -37,14 +32,14 @@ scenes:
         desc: >
           'Oh no! Maybe you should run for help before you get stab... wait, a cake? That\'s not dangerous at all!'
         text: >
-          'You take a proper look at the strange and alarming figure, and realise that it\'s a slightly-built
-          middle-aged woman. She\'s giving you a friendly smile, and holding out what looks to be a freshly made cupcake.
+          You take a proper look at the strange and alarming figure, and realise that it's a slightly-built
+          middle-aged woman. She's giving you a friendly smile, and holding out what looks to be a freshly made cupcake.
 
 
           Feeling a little shaken, almost as if you expected something horrid to happen, you ask her if you can help.
 
-          "Oh my, I didn\'t scare you did I?" She says, "I just thought you looked so awfully down in the dumps, and
-          perhaps one of our cupcakes might cheer you up."'
+          "Oh my, I didn't scare you did I?" She says, "I just thought you looked so awfully down in the dumps, and
+          perhaps one of our cupcakes might cheer you up."
         next:
         - Eat the cake
         - No thanks

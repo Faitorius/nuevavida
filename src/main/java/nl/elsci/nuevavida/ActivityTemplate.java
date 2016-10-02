@@ -10,12 +10,4 @@ public class ActivityTemplate {
     private List<String> events;
     private Outfit outfit;
     private ResultListener listener;
-
-    public void perform() {
-        pickEvent().occur(outfit, listener);
-    }
-
-    private Event pickEvent() {
-        return new Event(new EventTemplate());
-    }
 }

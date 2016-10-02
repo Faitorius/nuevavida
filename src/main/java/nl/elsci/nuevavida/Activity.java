@@ -23,11 +23,15 @@ public class Activity implements ResultListener {
 
         //TODO preprocessors
 
-        pickEvent().occur(outfit, listener);
+        if (!events.isEmpty()) {
+            pickEvent().occur(outfit, this);
+        } else {
+            listener.listen(result);
+        }
     }
 
     private Event pickEvent() {
-        return new Event(new EventTemplate());//TODO
+        return events.get(0);//TODO
     }
 
     @Override
