@@ -29,7 +29,7 @@ public class Event implements ResultListener {
 //        viewScene(scene, listener);
 
         GameScene scene = new GameScene(this, configuration.getScenes().get(eventTemplate.getScene()), elp);
-        viewScene(scene, this);
+        viewScene(scene, listener);
 
 //        listener.listen(result);//TODO
     }
