@@ -5,11 +5,16 @@ public class FullFemaleIntro implements Scheduler, ResultListener, NuevaVidaGame
     private int step = 0;
     private Result result = new Result();
     private ResultListener listener;
+    private GameSceneViewer viewer;
+
+    public FullFemaleIntro(GameSceneViewer viewer) {
+        this.viewer = viewer;
+    }
 
     @Override
     public void setListener(ResultListener listener) {
         this.listener = listener;
-        NuevaVidaGame.instance.viewGameScene("Intro");
+        viewer.viewGameScene("Intro");
     }
 
     @Override
@@ -30,7 +35,6 @@ public class FullFemaleIntro implements Scheduler, ResultListener, NuevaVidaGame
         } else {
             listener.listen(result);
         }
-
     }
 
     @Override
@@ -41,6 +45,6 @@ public class FullFemaleIntro implements Scheduler, ResultListener, NuevaVidaGame
         // TODO start game
         NuevaVidaGame.startGame(player, 52);
 
-        NuevaVidaGame.instance.viewGameScene("Intro 2");
+        viewer.viewGameScene("Intro 2");
     }
 }

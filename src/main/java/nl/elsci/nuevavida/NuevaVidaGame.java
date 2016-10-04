@@ -16,8 +16,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -28,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class NuevaVidaGame extends Application implements ResultListener {
+public class NuevaVidaGame extends Application implements ResultListener, GameSceneViewer {
 
     private final GameData gameData;
 
@@ -57,11 +55,9 @@ public class NuevaVidaGame extends Application implements ResultListener {
 
     private Action lastAction;
 
-    public static NuevaVidaGame instance;
     private ComboBox<String> workOutfitComboBox;
 
     public NuevaVidaGame() {
-        instance = this;
         Yaml yaml = new Yaml(new Constructor(Configuration.class));
         configuration = yaml.loadAs(NuevaVidaGame.class.getClass().getResourceAsStream("/config.yml"), Configuration.class);
         for (String file : configuration.getFiles()) {
@@ -79,7 +75,7 @@ public class NuevaVidaGame extends Application implements ResultListener {
         player.addTrait("BITCHY");
         elp.defineBean("player", player);
         elp.defineBean("configuration", configuration);
-        gameData = new GameData(configuration, elp);
+        gameData = new GameData(configuration, elp, this);
         elp.defineBean("gameData", gameData);
 
 
@@ -100,7 +96,7 @@ public class NuevaVidaGame extends Application implements ResultListener {
         weekPlannerScene = createWeekPlanner();
         sceneViewer = createSceneViewer();
 
-        Scheduler intro = new FullFemaleIntro();
+        Scheduler intro = new FullFemaleIntro(this);
         intro.setListener(this);
 
 //        viewWeekPlanner(gameData.getWeekStartInfo());
@@ -235,10 +231,12 @@ public class NuevaVidaGame extends Application implements ResultListener {
         primaryStage.setScene(weekPlannerScene);
     }
 
+    @Override //TODO keep?
     public void viewGameScene(String name) {
         viewGameScene(new GameScene(this, configuration.getScenes().get(name), elp));
     }
 
+    @Override
     public void viewGameScene(GameScene scene) {
 
         log.debug("switching to new scene");

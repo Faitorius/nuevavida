@@ -16,10 +16,12 @@ public class GameData {
     private Player player = new Player(); //TODO
     private Configuration configuration;
     private ELProcessor elp;
+    private GameSceneViewer viewer;
 
-    public GameData(Configuration configuration, ELProcessor elp) {
+    public GameData(Configuration configuration, ELProcessor elp, GameSceneViewer viewer) {
         this.configuration = configuration;
         this.elp = elp;
+        this.viewer = viewer;
     }
 
     public WeekStartInfo getWeekStartInfo() {
@@ -35,7 +37,7 @@ public class GameData {
         List<Event> freeTimeEvents = new ArrayList<>();
         for (Map.Entry<String, EventTemplate> entry : configuration.getEvents().entrySet()) {
             if (entry.getValue().getActivityTypes().contains("Free time")) {
-                freeTimeEvents.add(new Event(entry.getValue(), configuration, elp));
+                freeTimeEvents.add(new Event(entry.getValue(), configuration, elp, viewer));
             }
         }
 

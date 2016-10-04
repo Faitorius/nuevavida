@@ -15,11 +15,13 @@ public class Event implements ResultListener {
     private EventTemplate eventTemplate;
     private Configuration configuration;
     private ELProcessor elp;
+    private GameSceneViewer viewer;
 
-    public Event(EventTemplate eventTemplate, Configuration configuration, ELProcessor elp) {
+    public Event(EventTemplate eventTemplate, Configuration configuration, ELProcessor elp, GameSceneViewer viewer) {
         this.eventTemplate = eventTemplate;
         this.configuration = configuration;
         this.elp = elp;
+        this.viewer = viewer;
     }
 
     public void occur(Outfit outfit, ResultListener listener) {
@@ -36,7 +38,7 @@ public class Event implements ResultListener {
 
     private void viewScene(GameScene scene, ResultListener listener) {
         this.listener = listener;
-        NuevaVidaGame.instance.viewGameScene(scene);
+        viewer.viewGameScene(scene);
     }
 
     public int getWeight() {
