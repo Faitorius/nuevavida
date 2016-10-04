@@ -51,15 +51,15 @@ scenes:
       No thanks:
         desc: Offering you free cake? No thank you!
         text: >
-          gameData.addFlag('CUTE_CAKE_REJECTED');
+          gameData.flags.add('CUTE_CAKE_REJECTED');
           player.traits.contains('BITCHY')
           ? (player.incStress(-5);
-          'You rudely snap at the baker and tell her to leave you alone. Then you turn away and stomp back home.
+          "You rudely snap at the baker and tell her to leave you alone. Then you turn away and stomp back home.
 
-          For some reason, being rude to her makes you feel a little relaxed. It\'s almost as if you\'re a horrible
-          person, but no, she surely must have had it coming.')
+          For some reason, being rude to her makes you feel a little relaxed. It's almost as if you're a horrible
+          person, but no, she surely must have had it coming.")
 
-          : 'You politely decline the baker\'s offer, and get back on your way home.'
+          : "You politely decline the baker's offer, and get back on your way home."
 
       Throw it in her face:
         desc: Offering you free cake? How dare she! Throw it right in her cake-making face. That'll teach her.
