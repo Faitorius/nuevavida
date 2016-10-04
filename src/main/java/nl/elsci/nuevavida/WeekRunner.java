@@ -26,7 +26,6 @@ public class WeekRunner implements Scheduler, ResultListener {
 
     private void run() {
         if (activities.hasNext()) {
-            log.debug("running next activity");
             activities.next().perform(gameData, this);
         } else {
             listener.listen(result);

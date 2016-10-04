@@ -57,4 +57,8 @@ public class Player {
 
         return update;
     }
+
+    public void earnMoney(int amount) {
+        //TODO
+    }
 }

@@ -1,10 +1,12 @@
 package nl.elsci.nuevavida;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import nl.elsci.nuevavida.processors.Processor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+@Slf4j
 @Data
 public class Activity implements ResultListener {
     private String name;
@@ -16,17 +18,16 @@ public class Activity implements ResultListener {
     private GameData gameData;
     private Result result;
 
-    private List<Processor> preProcessors = new ArrayList<>();
-    private List<Processor> postProcessors = new ArrayList<>();
+    private Collection<Processor> preProcessors = new ArrayList<>();
+    private Collection<Processor> postProcessors = new ArrayList<>();
 
     public void perform(GameData gameData, ResultListener listener) {
         this.gameData = gameData;
         this.result = new Result();
         this.listener = listener;
 
-        //TODO preprocessors
         for (Processor processor : preProcessors) {
-            String output = processor.process();
+            String output = processor.process(gameData);
             if (output != null && output.length() > 0) {
                 result.append("\n" + output);
             }
@@ -48,7 +49,27 @@ public class Activity implements ResultListener {
     }
 
     private Event pickEvent() {
-        return events.get(0);//TODO
+        Map<Integer, Event> map = new HashMap<>();
+        int totalWeight = 0;
+        for (Event event : events) {
+            map.put(event.getWeight(), event);
+            totalWeight += event.getWeight();
+        }
+
+        log.debug("picking event, totalweight: " + totalWeight);
+        int rnd = new Random().nextInt(totalWeight);
+
+        log.debug("random nr: " + rnd);
+
+        int weightCounter = 0;
+        for (Map.Entry<Integer, Event> integerEventEntry : map.entrySet()) {
+            weightCounter += integerEventEntry.getKey();
+            if (rnd < weightCounter) {
+                return integerEventEntry.getValue();
+            }
+        }
+
+        return new DefaultEvent();
     }
 
     @Override
@@ -60,9 +81,8 @@ public class Activity implements ResultListener {
     public void listen(Result result) {
         this.result.add(result);
 
-        //TODO postprocessors
         for (Processor processor : postProcessors) {
-            String output = processor.process();
+            String output = processor.process(gameData);
             if (output != null && output.length() > 0) {
                 result.append("\n" + output);
             }

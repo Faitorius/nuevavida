@@ -25,8 +25,8 @@ public class Event implements ResultListener {
     }
 
     public void occur(Outfit outfit, ResultListener listener) {
-        Player player = new Player();
-        List npcs = new ArrayList();
+//        Player player = new Player();
+//        List npcs = new ArrayList();
 //        Scene scene = new Scene(player, npcs, this);
 //        viewScene(scene, listener);
 
@@ -42,16 +42,7 @@ public class Event implements ResultListener {
     }
 
     public int getWeight() {
-
-        ELProcessor elp = new ELProcessor();
-        elp.defineBean("player", new Player());
-        Object name = elp.eval("player.arousal > 10");
-
-        System.out.println(name.getClass());
-        System.out.println(name.toString());
-
-
-        return 1000;
+        return (int) (long) elp.eval(eventTemplate.getWeight());
     }
 
     @Override
