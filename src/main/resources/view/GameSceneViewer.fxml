@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<BorderPane prefHeight="710" prefWidth="1000" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/8.0.102" fx:controller="nl.elsci.nuevavida.GameSceneController">
+  <padding>
+    <Insets bottom="5" left="5" right="5" top="5"/>
+  </padding>
+
+  <center>
+    <TextArea fx:id="sceneText" editable="false" wrapText="true"/>
+  </center>
+
+  <bottom>
+    <BorderPane>
+      <top>
+        <FlowPane alignment="CENTER_RIGHT" hgap="5">
+          <padding>
+            <Insets bottom="5" left="5" right="5" top="5"/>
+          </padding>
+          <children>
+            <Button onAction="#describeScene">Describe Scene</Button>
+            <Button onAction="#describePeople">Describe People</Button>
+          </children>
+        </FlowPane>
+      </top>
+      <center>
+        <GridPane hgap="5">
+          <columnConstraints>
+            <ColumnConstraints percentWidth="35.0"/>
+            <ColumnConstraints percentWidth="50.0"/>
+          </columnConstraints>
+          <ListView fx:id="actionList" prefHeight="100" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+          <TextArea fx:id="descText" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+          <Button id="actionButton" onAction="#onActionButtonAction" prefHeight="220" prefWidth="200"
+                  GridPane.columnIndex="2" GridPane.rowIndex="0">
+            Take Action
+          </Button>
+        </GridPane>
+      </center>
+    </BorderPane>
+  </bottom>
+  <stylesheets>
+    <URL value="@gamesceneviewer.css"/>
+  </stylesheets>
+</BorderPane>

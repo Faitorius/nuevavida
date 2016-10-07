@@ -1,11 +1,11 @@
 package nl.elsci.nuevavida;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -22,26 +22,20 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import javax.el.ELException;
 import javax.el.ELProcessor;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class NuevaVidaGame extends Application implements ResultListener, GameSceneViewer {
+public class NuevaVidaGame extends Application implements ResultListener {
 
-    private final GameData gameData;
+    private GameData gameData;
 
     private Stage primaryStage;
 
     private Scene weekPlannerScene;
 
     private Scene sceneViewer;
-    private TextArea sceneText;
-    private ObservableList<Action> actionList;
-    private MultipleSelectionModel<Action> selectionModel;
-
-    private GameScene currentGameScene;
-    private final Action finishedAction;
-    private final Action proceedAction;
 
     private Configuration configuration;
     private ComboBox<Activity> dateActivityComboBox;
@@ -51,11 +45,9 @@ public class NuevaVidaGame extends Application implements ResultListener, GameSc
 
     private ELProcessor elp;
     private TextArea weekInfoText;
-    private GameScene nextGameScene;
-
-    private Action lastAction;
 
     private ComboBox<String> workOutfitComboBox;
+    private GameSceneController gameSceneController;
 
     public NuevaVidaGame() {
         Yaml yaml = new Yaml(new Constructor(Configuration.class));
@@ -75,17 +67,6 @@ public class NuevaVidaGame extends Application implements ResultListener, GameSc
         player.addTrait("BITCHY");
         elp.defineBean("player", player);
         elp.defineBean("configuration", configuration);
-        gameData = new GameData(configuration, elp, this);
-        elp.defineBean("gameData", gameData);
-
-
-        finishedAction = new Action();
-        finishedAction.setName("Finished");
-        finishedAction.setDesc("End the scene and move on to the next event, or to the next week if this is this week's last event.");
-
-        proceedAction = new Action();
-        proceedAction.setName("Proceed");
-        proceedAction.setDesc("Proceed to the next scene");
     }
 
     @Override
@@ -96,7 +77,10 @@ public class NuevaVidaGame extends Application implements ResultListener, GameSc
         weekPlannerScene = createWeekPlanner();
         sceneViewer = createSceneViewer();
 
-        Scheduler intro = new FullFemaleIntro(this);
+        gameData = new GameData(configuration, elp, gameSceneController);
+        elp.defineBean("gameData", gameData);
+
+        Scheduler intro = new FullFemaleIntro(gameSceneController);
         intro.setListener(this);
 
 //        viewWeekPlanner(gameData.getWeekStartInfo());
@@ -104,112 +88,17 @@ public class NuevaVidaGame extends Application implements ResultListener, GameSc
         primaryStage.show();
     }
 
-    private Scene createSceneViewer() {
+    private Scene createSceneViewer() throws IOException {
 
-        log.debug("creating sceneviewer scene");
+        FXMLLoader fxmlLoader = new FXMLLoader(NuevaVidaGame.class.getClass().getResource("/view/GameSceneViewer.fxml"));
 
-        BorderPane pane = new BorderPane();
-        pane.setPadding(new Insets(5));
-        sceneText = new TextArea();
-        sceneText.setFont(Font.font("Tahoma", 16));
-        sceneText.setEditable(false);
-        sceneText.setWrapText(true);
+        Parent parent = fxmlLoader.load();
+        gameSceneController = fxmlLoader.getController();
+        gameSceneController.setMain(this);
+        gameSceneController.setConfiguration(configuration);
+        gameSceneController.setElp(elp);
 
-        // already being done by appendText?
-//        sceneText.textProperty().addListener((observable, oldValue, newValue) -> sceneText.setScrollTop(Double.MAX_VALUE));
-
-        pane.setCenter(sceneText);
-        GridPane bottomGrid = new GridPane();
-        bottomGrid.setHgap(5);
-        ColumnConstraints columnConstraints1 = new ColumnConstraints();
-        columnConstraints1.setPercentWidth(35);
-        bottomGrid.getColumnConstraints().add(columnConstraints1);
-        ColumnConstraints columnConstraints2 = new ColumnConstraints();
-        columnConstraints2.setPercentWidth(50);
-        bottomGrid.getColumnConstraints().add(columnConstraints2);
-
-        BorderPane bottomBP = new BorderPane();
-        bottomBP.setCenter(bottomGrid);
-        FlowPane flowPane = new FlowPane();
-        flowPane.setHgap(5);
-        flowPane.setPadding(new Insets(5));
-        flowPane.setAlignment(Pos.CENTER_RIGHT);
-        Button button = new Button("Describe Scene");
-        button.setFont(Font.font("Tahoma", FontWeight.BOLD, 14));
-        button.setOnAction(event -> appendText(eval(currentGameScene.getTemplate().getDesc())));
-        flowPane.getChildren().add(button);
-        button = new Button("Describe People");
-        button.setFont(Font.font("Tahoma", FontWeight.BOLD, 14));
-        button.setOnAction(event -> appendText(eval(currentGameScene.getTemplate().getPeople())));
-        flowPane.getChildren().add(button);
-        bottomBP.setTop(flowPane);
-
-        pane.setBottom(bottomBP);
-
-        TextArea descTextArea = new TextArea();
-        descTextArea.setFont(Font.font("Tahoma", 16));
-        descTextArea.setEditable(false);
-        descTextArea.setWrapText(true);
-
-        actionList = FXCollections.observableArrayList();
-        ListView<Action> listView = new ListView<>(actionList);
-        listView.setCellFactory(param -> {
-            ListCell<Action> cell = new ListCell<Action>() {
-                @Override
-                protected void updateItem(Action item, boolean empty) {
-                    super.updateItem(item, empty);
-
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                    } else {
-                        setText(item.toString());
-                    }
-                }
-            };
-            cell.setFont(Font.font("Tahoma", 16));
-            return cell;
-        });
-        selectionModel = listView.getSelectionModel();
-        selectionModel.selectedItemProperty().addListener(($1, $2, newValue) -> {
-                    if (newValue != null) {
-                        descTextArea.setText(newValue.getDesc());
-                    } else {
-                        descTextArea.clear();
-                    }
-                });
-        listView.setPrefHeight(100);
-        listView.setPrefWidth(100);
-        bottomGrid.add(listView, 0, 0);
-        bottomGrid.add(descTextArea, 1, 0);
-        Button actionButton = new Button("Take Action");
-        actionButton.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 20));
-        actionButton.setPrefSize(200, 220);
-        actionButton.setOnAction(event -> {
-            Action selectedItem = listView.getSelectionModel().getSelectedItem();
-            lastAction = selectedItem;
-            if (selectedItem == finishedAction) {
-                clearSceneViewer();
-                GameScene scene = this.currentGameScene;
-                currentGameScene = null;
-                scene.notifyListener();
-            } else if (selectedItem == proceedAction && nextGameScene != null) {
-                GameScene scene = nextGameScene;
-                nextGameScene = null;
-                viewGameScene(scene);
-            } else if (selectedItem != null) {
-                doTransition(currentGameScene.process(selectedItem));
-            }
-        });
-
-        bottomGrid.add(actionButton, 2, 0);
-
-        return new Scene(pane, 1000, 710);
-    }
-
-    private void clearSceneViewer() {
-        sceneText.clear();
-        actionList.clear();
+        return new Scene(parent);
     }
 
     private void viewWeekPlanner(WeekStartInfo weekStartInfo) {
@@ -231,49 +120,7 @@ public class NuevaVidaGame extends Application implements ResultListener, GameSc
         primaryStage.setScene(weekPlannerScene);
     }
 
-    @Override //TODO keep?
-    public void viewGameScene(String name) {
-        viewGameScene(new GameScene(this, configuration.getScenes().get(name), elp));
-    }
-
-    @Override
-    public void viewGameScene(GameScene scene) {
-
-        log.debug("switching to new scene");
-
-        currentGameScene = scene;
-        clearSceneViewer();
-        doTransition(scene.getStartTransition());
-        primaryStage.setScene(sceneViewer);
-    }
-
-    private void doTransition(Transition transition) {
-        String text = eval(transition.getText());
-        appendText(text);
-
-        if (transition.getNextScene() != null) {
-            actionList.setAll(proceedAction);
-            nextGameScene = transition.getNextScene();
-        } else if (transition.getActions().size() == 0) {
-            actionList.setAll(finishedAction);
-        } else {
-            actionList.setAll(transition.getActions());
-        }
-        if (actionList.contains(lastAction)) {
-            selectionModel.select(lastAction);
-        } else {
-            selectionModel.select(0);
-        }
-    }
-
-    private void appendText(String text) {
-        if (sceneText.getText().length() > 0) {
-            sceneText.appendText("\n_______________________________________\n\n");
-        }
-        sceneText.appendText(text.trim());
-    }
-
-    private String eval(String text) {
+    public String eval(String text) {
         String eval;
         try {
             eval = (String) elp.eval(text);
@@ -401,6 +248,10 @@ public class NuevaVidaGame extends Application implements ResultListener, GameSc
         //TODO create NPCs
         //TODO create gameData
         //TODO set money
+    }
+
+    public void showSceneViewer() {
+        primaryStage.setScene(sceneViewer);
     }
 
     interface FemaleChargenListener {
